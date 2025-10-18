@@ -1,87 +1,60 @@
-# MTA Realtime API JSON Proxy
+# MTA realtime tracker sign
 
-MTAPI is a small HTTP server that converts the [MTA's realtime subway feed](https://api.mta.info/#/landing) from [Protocol Buffers/GTFS](https://developers.google.com/transit/gtfs/) to JSON. The app also adds caching and makes it possible to retrieve information by location and train line. 
+<img src="https://i.imgur.com/ADWqWPq.jpeg" width="75%">
 
-## Active Development
+This was a project completed in the Summer of 2024 after moving to New York City. I was looking for a live piece of wall art for my apartment and took interest in [MoMA's subway circuit board](https://store.moma.org/products/traintrackr-nyc-subway-circuit-board-2), however it was too small (especially for the price) and I was a fan of the [Hertz style, geographic subway map](https://www.mta.info/map/36946) so instead I decided to make something of my own. 
 
-This project is under active development and any part of the API may change. Feedback is very welcome.
+### The sign in action:
 
-## Running the server
+<iframe width="560" height="315" src="https://i.imgur.com/35l0BT1.mp4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-MTAPI is a Flask app designed to run under Python 3.3+.
 
-1. Create a `settings.cfg` file. A sample is provided as `settings.cfg.sample`.
-2. Set up your environment and install dependencies.  
-`$ python3 -m venv .venv`  
-`$ source .venv/bin/activate`  
-`$ python3 -m pip install -r requirements.txt`
-3. Run the server  
-`$ python app.py`
+### Materials:
+* [ESP32 S3 with a matrix portal addon from Adafruit](https://www.adafruit.com/product/5778) as the driver board
+* [16x32 LED panel](https://www.adafruit.com/product/420) as the light source for the stations
+* [2mm clear PMMA filament](https://www.amazon.com/gp/product/B0BLH9TSHV) as a (surprising effective) light pipe
+* [24x36 shadow box](https://www.hobbylobby.com/home-decor-frames/frames-framing-supplies/shadow-boxes-display-cases/jersey-display-case/p/81104055) to hold it all together
+* 24x36 poster board print of a Subway map
 
-If your configuration is named something other than `settings.cfg`, set the `MTAPI_SETTINGS` env variable to your configuration path.
+### Software
 
-This app makes use of Python threads. If running under uWSGI include the --enable-threads flag.
+There are 2 directories in this repo:
 
-## Endpoints
+* MTAPI
+  * A proxy server that converts the MTA's live GTFS data into a JSON format that can be fetched in a restful manner
+  * This is a fork of another repo that has a few tweaks to work better with the driver board
+* mta_sign
+  * The arduino files that run on the ESP to pull subway data from the above server (running on a pi), polling every minute or so, where every poll can retrieve the next ~15 minutes of subway data. 
+  * This could've been written a lot better, and potentially integrate with the MTA's GTFS data directly which would forgoe the need for a proxy server, however I wanted to challenge myself by writing this in C instead of an alternative like micropython. I have a raspberry pi running a few other things already so it was cheap to tack the flask server on top of it, which spared me the need to parse GTFS directly.
 
-[Endpoints to retrieve train data and sample input and output are listed here.](https://github.com/jonthornton/MTAPI/tree/master/docs/endpoints.md)
 
-## Settings
+### Hardware setup
 
-- **MTA_KEY** (required)  
-The API key provided at hhttps://api.mta.info/#/signup
-*default: None*
+Under the hood the only thing the above code is doing is representing each station as a pixel on the LED matrix board. When a train is within 60 seconds of arriving or leaving a station, the pixel will light up that respective train's bullet color. If multiple trains are at a station, like what occurs often at hubs like Times Sqaure, the colors will cycle between present trains on a 1 second interval. With everything stripped away, it looks like this:
 
-- **STATIONS_FILE** (required)  
-Path to the JSON file containing station information. See [Generating a Stations File](#generating-a-stations-file) for more info.  
-*default: None*
+<iframe width="560" height="315" src="https://i.imgur.com/18zfTne.mp4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-- **CROSS_ORIGIN**    
-Add [CORS](http://enable-cors.org/) headers to the HTTP output.  
-*default: "&#42;" when in debug mode, None otherwise*
+Excluding the Staten Island Railroad (sorry SI), most of the 512 pixels available has a station assigned to them.
 
-- **MAX_TRAINS**  
-Limits the number of trains that will be listed for each station.  
-*default: 10*
+From here, I 3D printed an LED shield that allows for the PMMA filament to slip right in, being held in place by friction
 
-- **MAX_MINUTES**  
-Limits how far in advance train information will be listed.  
-*default: 30*
+<img src="https://i.imgur.com/ikITR5w.jpeg" width="50%">
 
-- **CACHE_SECONDS**  
-How frequently the app will request fresh data from the MTA API.  
-*default: 60*
+The clear filament serves as an excellent light guide for distances up to several feet. I chose them for this project to avoid the need for hundreds of solder connections for individual LEDs to be directly behind each station, as well as their small widths allowing lights to be cramped together in places light brooklyn with stations in close proximity to one another.
 
-- **THREADED**  
-Enable background data refresh. This will prevent requests from hanging while new data is retreived from the MTA API.  
-*default: True*
+Lastly it was time to tap holes through the poster board for every station and route the filament from the LED board to each hole created:
 
-- **DEBUG**  
-Standard Flask option. Will enabled enhanced logging and wildcard CORS headers.  
-*default: False*
 
-## Generating a Stations File
+<img src="https://i.imgur.com/C60CSag.jpeg" width="50%">
 
-The MTA provides several static data files about the subway system but none include canonical information about each station. MTAPI includes a script that will parse the `stops.txt` and `transfers.txt` datasets provided by the MTA and attempt to group the different train stops into subway stations. MTAPI will use this JSON file for station names and locations. The grouping is not perfect and editing the resulting files is encouraged.
+Many people are surprised to hear the subway has over 400 stations. After glueing each and every one of them, it feels like there's a lot more
 
-Usage: 
-```
-$ python make_stations_csv.py stops.txt transfers.txt > stations.csv
-# edit groupings in stations.csv
-$ python make_stations_json.py stations.csv > stations.json
-# edit names in stations.json
-```
+<img src="https://i.imgur.com/qYN24U8.jpeg" width="50%">
 
-## Help
+Once this was done, everything was stuffed into the shadow box and the last step was to correct the station assignments to their correct pixel. Each station was routes to a pixel in no order, so I created a helper program to illuminate LEDs one at a time along with their coordinates and refactored the station definitions in code accordingly. After that, I had something you can't find at MoMA!
 
-Submit a [GitHub Issues request](https://github.com/jonthornton/MTAPI/issues). 
+### What I would do differently
 
-## Projects
+* Micropython for the driver code. It's a great language and I hate C
+* Alternative light sources. Although filament was easy for the assembly of this project, the end result is bulkier than I would like. Doing the work to wire small SMDs or maybe a set of cheap OLED panels would've meant a much thinner end result.
 
-Here are some projects that use MTAPI.
-
-* http://wheresthefuckingtrain.com
-
-## License
-
-The project is made available under the MIT license.
