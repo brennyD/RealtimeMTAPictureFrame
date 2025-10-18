@@ -6,14 +6,8 @@ This was a project completed in the Summer of 2024 after moving to New York City
 
 ### The sign in action:
 
-
-
 https://github.com/user-attachments/assets/207011f5-2aec-4f22-8b37-4fe9cce39da8
 
-
-
-
-<iframe width="560" height="315" src="https://i.imgur.com/35l0BT1.mp4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 ### Materials:
@@ -68,5 +62,6 @@ Once this was done, everything was stuffed into the shadow box and the last step
 
 * Micropython for the driver code. It's a great language and I hate C
 * Alternative light sources. Although filament was easy for the assembly of this project, the end result is bulkier than I would like. Doing the work to wire small SMDs or maybe a set of cheap OLED panels would've meant a much thinner end result.
+
 
 
