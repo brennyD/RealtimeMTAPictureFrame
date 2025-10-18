@@ -6,6 +6,13 @@ This was a project completed in the Summer of 2024 after moving to New York City
 
 ### The sign in action:
 
+
+
+https://github.com/user-attachments/assets/207011f5-2aec-4f22-8b37-4fe9cce39da8
+
+
+
+
 <iframe width="560" height="315" src="https://i.imgur.com/35l0BT1.mp4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
@@ -32,7 +39,11 @@ There are 2 directories in this repo:
 
 Under the hood the only thing the above code is doing is representing each station as a pixel on the LED matrix board. When a train is within 60 seconds of arriving or leaving a station, the pixel will light up that respective train's bullet color. If multiple trains are at a station, like what occurs often at hubs like Times Sqaure, the colors will cycle between present trains on a 1 second interval. With everything stripped away, it looks like this:
 
-<iframe width="560" height="315" src="https://i.imgur.com/18zfTne.mp4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+https://github.com/user-attachments/assets/8991e6cb-a24e-438c-a81f-8e20ade5f916
+
+
 
 Excluding the Staten Island Railroad (sorry SI), most of the 512 pixels available has a station assigned to them.
 
@@ -57,4 +68,5 @@ Once this was done, everything was stuffed into the shadow box and the last step
 
 * Micropython for the driver code. It's a great language and I hate C
 * Alternative light sources. Although filament was easy for the assembly of this project, the end result is bulkier than I would like. Doing the work to wire small SMDs or maybe a set of cheap OLED panels would've meant a much thinner end result.
+
 
